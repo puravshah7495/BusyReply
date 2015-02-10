@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,22 +17,14 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class ReplyListActivity extends ListActivity {
-    private ArrayAdapter<String> listAdapter;
-    private ArrayList<String> replyList;
-    private FileInputStream fileInput;
-    private FileOutputStream fileOutput;
-    private final String FILENAME = "reply_list.txt";
+    private ArrayAdapter<Reply> listAdapter;
+    private ArrayList<Reply> replyList;
     private String newReplyText;
+
+    private ReplyDataSource dataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +33,15 @@ public class ReplyListActivity extends ListActivity {
         final SharedPreferences sharedPreferences = PreferenceManager.
                 getDefaultSharedPreferences(getApplicationContext());
 
-        replyList = new ArrayList<String>();
-        replyList.add("Sorry, I'm busy right now. I will call you back later");
-        readFile();
-        listAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice,
+        replyList = new ArrayList<Reply>();
+
+        //readFile();
+        dataSource = new ReplyDataSource(this);
+        dataSource.open();
+        replyList = (ArrayList<Reply>) dataSource.getAllReplies();
+        dataSource.close();
+
+        listAdapter = new ArrayAdapter<Reply>(this, android.R.layout.simple_list_item_single_choice,
                 replyList);
         setListAdapter(listAdapter);
         listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
@@ -54,7 +50,7 @@ public class ReplyListActivity extends ListActivity {
         if (replyList.size() == 1 || reply.equals("")) {
             listView.setItemChecked(0, true);
         } else {
-            int replyIndex = replyList.indexOf(reply);
+            int replyIndex = sharedPreferences.getInt("INDEX", 0);
             listView.setItemChecked(replyIndex, true);
         }
 
@@ -62,7 +58,8 @@ public class ReplyListActivity extends ListActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 listView.setItemChecked(position, true);
-                sharedPreferences.edit().putString("REPLY", replyList.get(position)).apply();
+                sharedPreferences.edit().putString("REPLY", replyList.get(position).toString()).apply();
+                sharedPreferences.edit().putInt("INDEX", position).apply();
             }
         });
     }
@@ -73,6 +70,7 @@ public class ReplyListActivity extends ListActivity {
         inflater.inflate(R.menu.list_menu, menu);
 
         menu.getItem(0).setIcon(android.R.drawable.ic_menu_add);
+        menu.getItem(1).setIcon(android.R.drawable.ic_menu_delete);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -88,39 +86,6 @@ public class ReplyListActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void readFile() {
-        String lineRead;
-        try {
-            fileInput = openFileInput(FILENAME);
-            InputStreamReader streamReader = new InputStreamReader(fileInput);
-            BufferedReader bufferedReader = new BufferedReader(streamReader);
-
-            while ((lineRead = bufferedReader.readLine()) != null) {
-                replyList.add(lineRead);
-            }
-            fileInput.close();
-            streamReader.close();
-            bufferedReader.close();
-        } catch (FileNotFoundException e) {
-            File file = new File(getFilesDir(), FILENAME);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void writeToFile(String s) {
-        Log.w("file path", getFilesDir().getAbsolutePath());
-        try {
-            fileOutput = openFileOutput(FILENAME, MODE_APPEND);
-            fileOutput.write(s.getBytes());
-            fileOutput.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void promptInput() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("New Reply");
@@ -133,10 +98,10 @@ public class ReplyListActivity extends ListActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 newReplyText = input.getText().toString();
-                newReplyText = newReplyText + "\n";
-                replyList.add(newReplyText);
+                dataSource.open();
+                replyList.add(dataSource.creatReply(newReplyText));
                 listAdapter.notifyDataSetChanged();
-                writeToFile(newReplyText);
+                dataSource.close();
             }
         });
 
