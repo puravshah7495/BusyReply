@@ -5,4 +5,8 @@
         android:id="@+id/menu_add"
         android:title="Add"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_delete"
+        android:title="Delete"
+        app:showAsAction="always" />
 </menu>
