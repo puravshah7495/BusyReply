@@ -23,6 +23,7 @@ public class ReplyListActivity extends ListActivity {
     private ArrayAdapter<Reply> listAdapter;
     private ArrayList<Reply> replyList;
     private String newReplyText;
+    private SharedPreferences sharedPreferences;
 
     private ReplyDataSource dataSource;
 
@@ -30,10 +31,10 @@ public class ReplyListActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final ListView listView = getListView();
-        final SharedPreferences sharedPreferences = PreferenceManager.
-                getDefaultSharedPreferences(getApplicationContext());
 
         replyList = new ArrayList<Reply>();
+        final SharedPreferences sharedPreferences = PreferenceManager.
+                getDefaultSharedPreferences(this);
 
         //readFile();
         dataSource = new ReplyDataSource(this);
@@ -72,6 +73,10 @@ public class ReplyListActivity extends ListActivity {
         menu.getItem(0).setIcon(android.R.drawable.ic_menu_add);
         menu.getItem(1).setIcon(android.R.drawable.ic_menu_delete);
 
+        if (replyList.size() == 1) {
+            menu.getItem(1).setEnabled(false);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -83,7 +88,22 @@ public class ReplyListActivity extends ListActivity {
             promptInput();
         }
 
+        if (id == R.id.menu_delete) {
+            removeReply();
+        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (replyList.size() == 1) {
+            menu.getItem(1).setEnabled(false);
+        } else {
+            menu.getItem(1).setEnabled(true);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     public void promptInput() {
@@ -113,5 +133,21 @@ public class ReplyListActivity extends ListActivity {
         });
 
         builder.show();
+    }
+
+    public void removeReply() {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int removeIndex = sharedPreferences.getInt("INDEX", 0);
+        Reply replyToDelete = replyList.get(removeIndex);
+        replyList.remove(removeIndex);
+        listAdapter.notifyDataSetChanged();
+        getListView().setItemChecked(removeIndex - 1, true);
+
+        sharedPreferences.edit().putString("REPLY", replyList.get(removeIndex - 1).toString()).apply();
+        sharedPreferences.edit().putInt("INDEX", removeIndex - 1).apply();
+
+        dataSource.open();
+        dataSource.deleteReply(replyToDelete);
+        dataSource.close();
     }
 }
