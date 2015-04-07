@@ -1,16 +1,20 @@
 package com.example.purav.busyreply;
 
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,18 +23,32 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class ReplyListActivity extends ListActivity {
+public class ReplyListActivity extends ActionBarActivity {
     private ArrayAdapter<Reply> listAdapter;
     private ArrayList<Reply> replyList;
     private String newReplyText;
     private SharedPreferences sharedPreferences;
+    private Toolbar mToolbar;
+    private ListView listView;
 
     private ReplyDataSource dataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final ListView listView = getListView();
+        setContentView(R.layout.activity_reply_list);
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(R.color.darker_navy_blue));
+        }
+
+        listView = (ListView) findViewById(R.id.reply_list);
 
         replyList = new ArrayList<Reply>();
         final SharedPreferences sharedPreferences = PreferenceManager.
@@ -44,7 +62,7 @@ public class ReplyListActivity extends ListActivity {
 
         listAdapter = new ArrayAdapter<Reply>(this, android.R.layout.simple_list_item_single_choice,
                 replyList);
-        setListAdapter(listAdapter);
+        listView.setAdapter(listAdapter);
         listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 
         String reply = sharedPreferences.getString("REPLY", "");
@@ -141,7 +159,7 @@ public class ReplyListActivity extends ListActivity {
         Reply replyToDelete = replyList.get(removeIndex);
         replyList.remove(removeIndex);
         listAdapter.notifyDataSetChanged();
-        getListView().setItemChecked(removeIndex - 1, true);
+        listView.setItemChecked(removeIndex - 1, true);
 
         sharedPreferences.edit().putString("REPLY", replyList.get(removeIndex - 1).toString()).apply();
         sharedPreferences.edit().putInt("INDEX", removeIndex - 1).apply();

@@ -4,11 +4,16 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <include
+        layout="@layout/toolbar"
+        android:id="@+id/toolbar"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:id="@+id/toggle_layout"
-        android:background="#ff40474d">
+        android:background="@color/material_blue_grey_950"
+        android:layout_below="@id/toolbar">
 
         <TextView
             android:layout_width="0dp"
@@ -17,6 +22,7 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:text="Enable Auto-Reply"
+            android:textColor="@color/dark_pink"
             android:layout_marginLeft="10dp"
             android:id="@+id/toggleText" />
 
@@ -37,6 +43,7 @@
         android:text="Current Reply Message:"
         android:textSize="@dimen/abc_text_size_medium_material"
         android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
         android:id="@+id/textView1"
         android:layout_below="@id/toggle_layout" />
 
@@ -45,6 +52,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/reply_text"
         android:text="Sorry, I'm busy right now. I will call you back later"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_below="@+id/textView1" />
 
     <Button
@@ -52,6 +61,7 @@
         android:layout_height="wrap_content"
         android:text="Change"
         android:id="@+id/change_button"
+        android:layout_marginLeft="10dp"
         android:layout_below="@+id/reply_text"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
