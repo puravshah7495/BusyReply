@@ -8,44 +8,39 @@
         layout="@layout/toolbar"
         android:id="@+id/toolbar"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:id="@+id/toggle_layout"
-        android:background="@color/material_blue_grey_950"
-        android:layout_below="@id/toolbar">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/abc_text_size_large_material"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:text="Enable Auto-Reply"
-            android:textColor="@color/dark_pink"
-            android:layout_marginLeft="10dp"
-            android:id="@+id/toggleText" />
-
-        <Switch
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:switchMinWidth="50dp"
-            android:textOn="Reply On"
-            android:textOff="Reply Off"
-            android:id="@+id/reply_toggle"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="10dp" />
-    </LinearLayout>
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="@dimen/abc_text_size_large_material"
+        android:layout_weight="1"
+        android:layout_gravity="center_horizontal"
+        android:text="Enable/Disable Auto-Reply"
+        android:id="@+id/toggleText"
+        android:layout_below="@id/toolbar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+
+    <ToggleButton
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:textOn="Auto Reply Enabled"
+        android:textOff="Auto Reply Disabled"
+        android:id="@+id/reply_toggle"
+        android:background="@drawable/custom_selector"
+        android:layout_below="@id/toggleText"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:text="Current Reply Message:"
         android:textSize="@dimen/abc_text_size_medium_material"
-        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:layout_marginTop="30dp"
         android:layout_marginLeft="10dp"
         android:id="@+id/textView1"
-        android:layout_below="@id/toggle_layout" />
+        android:layout_below="@id/reply_toggle"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -53,18 +48,18 @@
         android:id="@+id/reply_text"
         android:text="Sorry, I'm busy right now. I will call you back later"
         android:layout_marginLeft="10dp"
+        android:gravity="center"
         android:layout_marginRight="10dp"
         android:layout_below="@+id/textView1" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Change"
+        android:text="Change Message"
         android:id="@+id/change_button"
-        android:layout_marginLeft="10dp"
-        android:layout_below="@+id/reply_text"
+        android:background="@color/red_orange"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

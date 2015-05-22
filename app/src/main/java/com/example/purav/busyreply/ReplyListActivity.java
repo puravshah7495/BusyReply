@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -127,10 +128,12 @@ public class ReplyListActivity extends ActionBarActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 newReplyText = input.getText().toString();
-                dataSource.open();
-                replyList.add(dataSource.creatReply(newReplyText));
-                listAdapter.notifyDataSetChanged();
-                dataSource.close();
+                if (!newReplyText.isEmpty()) {
+                    dataSource.open();
+                    replyList.add(dataSource.creatReply(newReplyText));
+                    listAdapter.notifyDataSetChanged();
+                    dataSource.close();
+                }
             }
         });
 
@@ -145,6 +148,11 @@ public class ReplyListActivity extends ActionBarActivity {
     }
 
     public void removeReply() {
+        if (replyList.size() == 1) {
+            Toast.makeText(this, "Must have at least 1 reply", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int removeIndex = sharedPreferences.getInt("INDEX", 0);
         Reply replyToDelete = replyList.get(removeIndex);

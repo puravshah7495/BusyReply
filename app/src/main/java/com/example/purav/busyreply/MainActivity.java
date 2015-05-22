@@ -11,14 +11,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 
 public class MainActivity extends ActionBarActivity {
     private TextView mReplyView;
     private Button mChangeButton;
-    private Switch mToggleReply;
+    private ToggleButton mToggleReply;
     private Toolbar mToolbar;
     private String reply;
 
@@ -29,7 +29,7 @@ public class MainActivity extends ActionBarActivity {
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mReplyView = (TextView) findViewById(R.id.reply_text);
-        mToggleReply = (Switch) findViewById(R.id.reply_toggle);
+        mToggleReply = (ToggleButton) findViewById(R.id.reply_toggle);
         mChangeButton = (Button) findViewById(R.id.change_button);
 
         setSupportActionBar(mToolbar);
@@ -56,11 +56,18 @@ public class MainActivity extends ActionBarActivity {
                 if (isChecked) {
                     startService(serviceIntent);
                     AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE)
+                        sharedPref.edit().putBoolean("VIBRATE", true).commit();
+                    else
+                        sharedPref.edit().putBoolean("VIBRATE", false).commit();
                     audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                 } else {
                     stopService(serviceIntent);
                     AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                    if (sharedPref.getBoolean("VIBRATE", false) == true)
+                        audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                    else
+                        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
                 }
             }
         });

@@ -3,9 +3,27 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="android:colorBackground">@color/grey_light_blue</item>
-        <item name="colorPrimary">@color/navy_blue</item>
-        <item name="colorPrimaryDark">@color/darker_navy_blue</item>
+        <item name="android:colorBackground">@color/dark_blue</item>
+        <item name="colorPrimary">@color/light_black</item>
+        <item name="colorPrimaryDark">@color/darker_black</item>
+        <item name="android:textColor">@color/peach_white</item>
+        <item name="android:colorActivatedHighlight">@color/dark_green</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="android:editTextStyle">@style/CustomEditTextStyle</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@color/dark_blue</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+        <item name="android:editTextStyle">@style/CustomEditTextStyle</item>
+    </style>
+
+    <style name="CustomEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/peach_white</item>
     </style>
 
 </resources>
