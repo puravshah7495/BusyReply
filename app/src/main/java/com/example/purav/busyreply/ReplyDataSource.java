@@ -9,6 +9,10 @@ import android.database.sqlite.SQLiteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.purav.busyreply.MySQLiteHelper.COLUMN_ID;
+import static com.example.purav.busyreply.MySQLiteHelper.COLUMN_REPLY;
+import static com.example.purav.busyreply.MySQLiteHelper.TABLE_REPLY;
+
 /**
  * Created by Purav on 2/9/2015.
  */
@@ -32,8 +36,8 @@ public class ReplyDataSource {
     public Reply creatReply(String reply) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_REPLY, reply);
-        long insertId = database.insert(MySQLiteHelper.TABLE_REPLY, null, values);
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_REPLY, allColumns, MySQLiteHelper.COLUMN_ID +
+        long insertId = database.insert(TABLE_REPLY, null, values);
+        Cursor cursor = database.query(TABLE_REPLY, allColumns, COLUMN_ID +
                 " = " + insertId, null, null, null, null);
         cursor.moveToFirst();
         Reply newReply = new Reply(insertId, reply);
@@ -43,12 +47,20 @@ public class ReplyDataSource {
 
     public void deleteReply(Reply reply) {
         long id = reply.getId();
-        database.delete(MySQLiteHelper.TABLE_REPLY, MySQLiteHelper.COLUMN_ID + " = " + id, null);
+        database.delete(TABLE_REPLY, COLUMN_ID + " = " + id, null);
+    }
+
+    public Reply updateReply(Reply replyToEdit, String newText) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_REPLY, newText);
+
+        database.update(TABLE_REPLY, values, COLUMN_ID + " = ?", new String[]{replyToEdit.getId() + ""});
+        return new Reply(replyToEdit.getId(), newText);
     }
 
     public List<Reply> getAllReplies() {
         List<Reply> replies = new ArrayList<Reply>();
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_REPLY, allColumns, null, null, null, null, null);
+        Cursor cursor = database.query(TABLE_REPLY, allColumns, null, null, null, null, null);
         cursor.moveToFirst();
 
         while (!cursor.isAfterLast()) {

@@ -29,12 +29,17 @@ public class ReplyListActivity extends ActionBarActivity {
     private Toolbar mToolbar;
     private ListView listView;
 
+    private AlertDialog.Builder addDialogBuilder;
+    private AlertDialog.Builder editDialogBuilder;
     private ReplyDataSource dataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reply_list);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        initAddDialog();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -81,10 +86,11 @@ public class ReplyListActivity extends ActionBarActivity {
         inflater.inflate(R.menu.list_menu, menu);
 
         menu.getItem(0).setIcon(android.R.drawable.ic_menu_add);
-        menu.getItem(1).setIcon(android.R.drawable.ic_menu_delete);
+        menu.getItem(1).setIcon(android.R.drawable.ic_menu_edit);
+        menu.getItem(2).setIcon(android.R.drawable.ic_menu_delete);
 
         if (replyList.size() == 1) {
-            menu.getItem(1).setEnabled(false);
+            menu.getItem(2).setEnabled(false);
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -95,11 +101,15 @@ public class ReplyListActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         if (id == R.id.menu_add) {
-            promptInput();
+            addDialogBuilder.show();
         }
 
         if (id == R.id.menu_delete) {
             removeReply();
+        }
+
+        if (id == R.id.menu_edit) {
+            promptEdit();
         }
 
         return super.onOptionsItemSelected(item);
@@ -116,15 +126,15 @@ public class ReplyListActivity extends ActionBarActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    public void promptInput() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("New Reply");
+    public void initAddDialog() {
+        addDialogBuilder = new AlertDialog.Builder(this);
+        addDialogBuilder.setTitle("New Reply");
 
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
+        addDialogBuilder.setView(input);
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        addDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 newReplyText = input.getText().toString();
@@ -137,14 +147,12 @@ public class ReplyListActivity extends ActionBarActivity {
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        addDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
         });
-
-        builder.show();
     }
 
     public void removeReply() {
@@ -153,7 +161,6 @@ public class ReplyListActivity extends ActionBarActivity {
             return;
         }
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int removeIndex = sharedPreferences.getInt("INDEX", 0);
         Reply replyToDelete = replyList.get(removeIndex);
         replyList.remove(removeIndex);
@@ -166,5 +173,45 @@ public class ReplyListActivity extends ActionBarActivity {
         dataSource.open();
         dataSource.deleteReply(replyToDelete);
         dataSource.close();
+    }
+
+    public void promptEdit() {
+        editDialogBuilder = new AlertDialog.Builder(this);
+        editDialogBuilder.setTitle("Edit Reply");
+
+        int editIndex = sharedPreferences.getInt("INDEX", 0);
+        Reply replyToEdit = replyList.get(editIndex);
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setText(replyToEdit.getReply());
+        editDialogBuilder.setView(input);
+
+        editDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                newReplyText = input.getText().toString();
+                if (!newReplyText.isEmpty()) {
+                    int editIndex = sharedPreferences.getInt("INDEX", 0);
+                    Reply replyToEdit = replyList.get(editIndex);
+
+                    dataSource.open();
+                    replyList.remove(replyToEdit);
+                    replyList.add(editIndex, dataSource.updateReply(replyToEdit, newReplyText));
+                    dataSource.close();
+
+                    sharedPreferences.edit().putString("REPLY", replyList.get(editIndex).toString()).apply();
+                }
+            }
+        });
+
+        editDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        editDialogBuilder.show();
     }
 }

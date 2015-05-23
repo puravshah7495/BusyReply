@@ -6,6 +6,10 @@
         android:title="Add"
         app:showAsAction="always" />
     <item
+        android:id="@+id/menu_edit"
+        android:title="Edit"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/menu_delete"
         android:title="Delete"
         app:showAsAction="always" />

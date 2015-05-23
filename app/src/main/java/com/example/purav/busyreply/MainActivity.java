@@ -22,6 +22,9 @@ public class MainActivity extends ActionBarActivity {
     private Toolbar mToolbar;
     private String reply;
 
+    Intent serviceIntent;
+    Intent startIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +51,8 @@ public class MainActivity extends ActionBarActivity {
             mReplyView.setText(reply);
         }
 
-        final Intent serviceIntent = new Intent(this, SmsService.class);
+        serviceIntent = new Intent(this, SmsService.class);
+        startIntent = new Intent(this, ReplyListActivity.class);
 
         mToggleReply.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -75,7 +79,6 @@ public class MainActivity extends ActionBarActivity {
         mChangeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent startIntent = new Intent(v.getContext(), ReplyListActivity.class);
                 startActivity(startIntent);
             }
         });
